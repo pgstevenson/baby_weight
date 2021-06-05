@@ -1,0 +1,57 @@
+version: "3.6"
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    networks:
+      - net
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+      - 443:443
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    depends_on:
+      - shinyproxy
+  shinyproxy:
+    image: telethonkids/shinyproxy
+    container_name: shinyproxy
+    networks:
+      - net
+    volumes:
+      - ./application.yml:/opt/shinyproxy/application.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 8080:8080
+  db:
+    image: postgres:11-alpine
+    container_name: db
+    networks:
+      - net
+    environment:
+      - POSTGRES_USER=docker
+      - POSTGRES_PASSWORD=z2VT#&4nYid#
+      - TZ=Australia/Perth
+    volumes:
+      - ./01_baby_weight.sql:/docker-entrypoint-initdb.d/01_init.sql
+      - ./data:/home/data
+      - dbdata:/var/lib/postgresql/data/
+    ports:
+      - 5432:5432
+  api:
+    image: pgstevenson/baby_weight_api
+    container_name: api
+    restart: on-failure
+    networks:
+      - net
+    ports:
+      - 5000:5000
+    depends_on:
+      - db
+
+networks:
+  net:
+    name: net
+
+volumes:
+  dbdata:

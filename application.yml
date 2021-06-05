@@ -1,0 +1,23 @@
+proxy:
+  title: Paul Stevenson Shiny Apps
+  hide-navbar: false
+  landing-page: /
+  heartbeat-rate: 10000
+  heartbeat-timeout: 600000
+  port: 8080
+  docker:
+    internal-networking: true
+  specs:
+  - id: baby_weight
+    display-name: Baby Weight App
+    description: Baby Weight App
+    container-cmd: ["R", "-e", "shiny::runApp('/root/app')"]
+    container-image: pgstevenson/baby_weight
+    container-network: net
+    container-env:
+      user: "shiny"
+      environment:
+        - APPLICATION_LOGS_TO_STDOUT=true
+logging:
+  file:
+    shinyproxy.log

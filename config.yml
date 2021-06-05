@@ -1,0 +1,8 @@
+default:
+  api: "http://192.168.0.9"
+
+development:
+  api: "http://localhost"
+
+production:
+  api: "http://api:5000"
